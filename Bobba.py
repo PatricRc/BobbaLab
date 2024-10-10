@@ -41,7 +41,7 @@ def load_data_from_url():
         st.error(f"Error reading the Excel file: {e}")
         st.stop()
 
-def chat_with_data(df_chat, input_text):
+def chat_with_data(df_chat, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
         # Convert DataFrame to a more manageable format
@@ -66,7 +66,7 @@ def chat_with_data(df_chat, input_text):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
+        
         if not openai_api_key:
             st.warning("Please enter a valid OpenAI API key.")
             return
@@ -83,8 +83,11 @@ def chat_with_data(df_chat, input_text):
 def main():
     st.title("Chat with Your CSV/XLSX Data")
 
-    # API key input
-        # Load data
+    # Load data
+    openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
+    if not openai_api_key:
+        st.warning("Please enter a valid OpenAI API key.")
+        return
     df = load_data_from_url()
     if df is not None:
         st.write("Data Preview:")
@@ -95,7 +98,10 @@ def main():
 
         # Chat button
         if st.button("Chat with Data") and input_text:
-            chat_with_data(df, input_text)
+            chat_with_data(df, input_text, openai_api_key)
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()

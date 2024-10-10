@@ -13,3 +13,7 @@ textColor = "#ffffff"
 
 [client]
 toolbarMode = "minimal"
+
+[openai]
+api_key = "sk-aEs66jJ8EvpUXr1hanGq6NUcW5kjhtzSh2g7nMXSSdT3BlbkFJOmfLE-x1bjntgit-3WXC6uZHMX4S1hHIl6Co3Ym4UA"
+

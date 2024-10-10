@@ -8,10 +8,6 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 import os
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.vectorstores import Chroma
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains import ConversationalRetrievalChain
 
 # Load data from URL
 @st.cache_data
@@ -34,24 +30,26 @@ def load_data_from_url():
         st.error(f"Error reading the Excel file: {e}")
         st.stop()
 
-# Process user queries
 # Chat with data using OpenAI
 def chat_with_data(df, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
-        # Use the processed query for a summary response
-        context = f"The dataset has {len(df)} rows and {len(df.columns)} columns.
-"
-        context += "
-Column names: " + ", ".join(df.columns) + "
-"
-        context += "
-Summary statistics:
-" + df.describe().to_string() + "
-"
-        context += "
-Sample rows:
-" + df.head(10).to_string(index=False)
+        # Provide a summary context of the entire dataset
+        summary_context = {
+            "total_rows": len(df),
+            "total_columns": len(df.columns),
+            "column_names": df.columns.tolist(),
+            "summary_statistics": df.describe().to_dict(),
+            "sample_rows": df.to_dict(orient='records')
+        }
+
+        # Convert summary context to a descriptive string
+        context = (
+            f"The dataset contains {summary_context['total_rows']} rows and {summary_context['total_columns']} columns.\n"
+            f"The columns are: {', '.join(summary_context['column_names'])}.\n"
+            f"Summary statistics: {summary_context['summary_statistics']}\n"
+            f"Here are 10 sample rows: {summary_context['sample_rows']}\n"
+        )
 
         # Create a prompt template
         message = f"""

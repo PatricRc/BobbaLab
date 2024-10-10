@@ -31,18 +31,19 @@ def load_data_from_url():
         st.error(f"Error reading the Excel file: {e}")
         st.stop()
 
-def chat_with_data(df_chat, input_text, api_key):
+def chat_with_data(df_chat, input_text):
     """Chat with the survey data using OpenAI."""
     try:
-        # Convert DataFrame to a format suitable for context
-        context = df_chat.to_string(index=False)
+        # Convert DataFrame to a more manageable format
+        max_context_length = 3000  # Limit the context length to avoid exceeding API limits
+        context = df_chat.head(100).to_string(index=False)  # Use only the first 100 rows for context
 
         # Create a prompt template
         message = f"""
         Answer the following question using the context provided:
 
         Context:
-        {context}
+        {context[:max_context_length]}
 
         Question:
         {input_text}
@@ -51,7 +52,7 @@ def chat_with_data(df_chat, input_text, api_key):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="sk-9WrTFspzzagjDYipmmgHCUoSxEhDily6TYtLXA-k06T3BlbkFJ0BWj5FJF17WmpM5I7NSh7y5zarpu9zaoawiQeNOaAA")
 
         # Generate response
         response = llm.predict(message)
@@ -65,9 +66,7 @@ def main():
     st.title("Chat with Your CSV/XLSX Data")
 
     # API key input
-    api_key = st.text_input("Enter your OpenAI API key", type="password")
-
-    # Load data
+        # Load data
     df = load_data_from_url()
     if df is not None:
         st.write("Data Preview:")
@@ -78,7 +77,7 @@ def main():
 
         # Chat button
         if st.button("Chat with Data") and input_text:
-            chat_with_data(df, input_text, api_key)
+            chat_with_data(df, input_text, "sk-9WrTFspzzagjDYipmmgHCUoSxEhDily6TYtLXA-k06T3BlbkFJ0BWj5FJF17WmpM5I7NSh7y5zarpu9zaoawiQeNOaAA")
 
 if __name__ == "__main__":
     main()

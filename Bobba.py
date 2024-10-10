@@ -40,25 +40,23 @@ def chat_with_data(df_chat, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
         # Convert DataFrame to a more manageable format
-        max_context_length = 3000  # Limit the context length to avoid exceeding API limits
+        max_context_length = 10000  # Increase limit to allow more context while staying under API constraints  # Limit the context length to avoid exceeding API limits
         filtered_df = df_chat[df_chat.apply(lambda row: input_text.split()[-1] in row.values.astype(str), axis=1)]
         if not filtered_df.empty:
             context = filtered_df.to_string(index=False)
         else:
-            context = df_chat.to_string(index=False)  # Use a general context if no specific filter is found
+            context = df_chat.head(50).to_string(index=False)  # Limit to first 50 rows to avoid exceeding API limits  # Use a general context if no specific filter is found
 
         # Create a prompt template
-        message = f"""
-        Answer the following question using the context provided:
+        message = f"Answer the following question using the provided context:
 
-        Context:
-        {context}
+Context:
+{context[:max_context_length]}
 
-        Question:
-        {input_text}
+Question:
+{input_text}
 
-        Answer:
-        """
+Answer:"
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
         

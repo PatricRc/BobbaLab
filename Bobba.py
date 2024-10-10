@@ -66,7 +66,7 @@ def chat_with_data(df_chat, input_text):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="YOUR_VALID_OPENAI_API_KEY")
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="sk-RbwIZK5Qb1b_sWhMug-YhDNOmCwNrGcJ11OQbbdkuFT3BlbkFJdN1-K8s7iabMUeEeHMvDMjekBpcmjworHQyPQEYlAA")
 
         # Generate response
         response = llm.predict(message)

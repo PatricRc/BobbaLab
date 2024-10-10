@@ -87,7 +87,7 @@ def main():
 
         # Chat button
         if st.button("Chat with Data") and input_text:
-            chat_with_data(df, input_text, "sk-9WrTFspzzagjDYipmmgHCUoSxEhDily6TYtLXA-k06T3BlbkFJ0BWj5FJF17WmpM5I7NSh7y5zarpu9zaoawiQeNOaAA")
+            chat_with_data(df, input_text)
 
 if __name__ == "__main__":
     main()

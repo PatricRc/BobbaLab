@@ -14,23 +14,22 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
 
 @st.cache_data
-def load_data(uploaded_file):
-    """Load data from the uploaded file."""
+def load_data_from_url():
+    """Load data from the given URL."""
+    # Load the dataset from the GitHub repository
+    file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
     try:
-        # Load based on file type
-        if uploaded_file.name.endswith("xlsx"):
-            df = pd.read_excel(uploaded_file, engine='openpyxl')
-        elif uploaded_file.name.endswith("csv"):
-            df = pd.read_csv(uploaded_file)
-        else:
-            st.error("Unsupported file type.")
-            return None
-
+        response = requests.get(file_url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        file_data = io.BytesIO(response.content)
+        df = pd.read_excel(file_data, engine='openpyxl', sheet_name='Sheet1')
         return df
-
-    except Exception as e:
-        st.error(f"Error processing the file: {e}")
-        return None
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error loading the dataset: {e}")
+        st.stop()
+    except ValueError as e:
+        st.error(f"Error reading the Excel file: {e}")
+        st.stop()
 
 def chat_with_data(df_chat, input_text, api_key):
     """Chat with the survey data using OpenAI."""
@@ -65,25 +64,21 @@ def chat_with_data(df_chat, input_text, api_key):
 def main():
     st.title("Chat with Your CSV/XLSX Data")
 
-    # File uploader
-    uploaded_file = st.file_uploader("Upload an XLSX or CSV file", type=["xlsx", "csv"])
-
     # API key input
     api_key = st.text_input("Enter your OpenAI API key", type="password")
 
     # Load data
-    if uploaded_file is not None:
-        df = load_data(uploaded_file)
-        if df is not None:
-            st.write("Data Preview:")
-            st.dataframe(df)
+    df = load_data_from_url()
+    if df is not None:
+        st.write("Data Preview:")
+        st.dataframe(df)
 
-            # User query input
-            input_text = st.text_area("Ask a question about your data:")
+        # User query input
+        input_text = st.text_area("Ask a question about your data:")
 
-            # Chat button
-            if st.button("Chat with Data") and input_text:
-                chat_with_data(df, input_text, api_key)
+        # Chat button
+        if st.button("Chat with Data") and input_text:
+            chat_with_data(df, input_text, api_key)
 
 if __name__ == "__main__":
     main()

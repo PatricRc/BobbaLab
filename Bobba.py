@@ -29,8 +29,10 @@ def load_data_from_url():
             st.stop()  # Raise an error for bad status codes
         file_data = io.BytesIO(response.content)
         st.write("Data successfully fetched from URL.")
-        df = pd.read_excel(file_data, engine='openpyxl', sheet_name='Sheet1')
-        st.write("Excel file successfully read.")
+        xlsx = pd.ExcelFile(file_data, engine='openpyxl')
+        st.write("Available sheets:", xlsx.sheet_names)
+        df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
+        st.write(f"Excel file successfully read. Loaded sheet: {xlsx.sheet_names[0]}")
         return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error loading the dataset: {e}")

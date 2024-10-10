@@ -46,14 +46,18 @@ def chat_with_data(df_chat, input_text):
     try:
         # Convert DataFrame to a more manageable format
         max_context_length = 3000  # Limit the context length to avoid exceeding API limits
-        context = df_chat.head(100).to_string(index=False)  # Use only the first 100 rows for context
+        filtered_df = df_chat[df_chat.apply(lambda row: input_text.split()[-1] in row.values.astype(str), axis=1)]
+        if not filtered_df.empty:
+            context = filtered_df.to_string(index=False)
+        else:
+            context = df_chat.head(10).to_string(index=False)  # Use a general context if no specific filter is found  # Use only the first 100 rows for context
 
         # Create a prompt template
         message = f"""
         Answer the following question using the context provided:
 
         Context:
-        {context[:max_context_length]}
+        {context}
 
         Question:
         {input_text}
@@ -62,7 +66,8 @@ def chat_with_data(df_chat, input_text):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="sk-9WrTFspzzagjDYipmmgHCUoSxEhDily6TYtLXA-k06T3BlbkFJ0BWj5FJF17WmpM5I7NSh7y5zarpu9zaoawiQeNOaAA")
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="sk-9WrTFspzzagjDYipmmgHCUoSxEhDily6TYtLXA-k06T3BlbkFJ0BWj5FJF17WmpM5I7NSh7y5zarpu9zaoawiQeNOaAA
+")
 
         # Generate response
         response = llm.predict(message)

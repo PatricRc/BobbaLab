@@ -7,6 +7,7 @@ import io
 import requests
 from sklearn.ensemble import RandomForestRegressor
 import os
+import toml
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores import Chroma
@@ -66,7 +67,8 @@ def chat_with_data(df_chat, input_text):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key="sk-RbwIZK5Qb1b_sWhMug-YhDNOmCwNrGcJ11OQbbdkuFT3BlbkFJdN1-K8s7iabMUeEeHMvDMjekBpcmjworHQyPQEYlAA")
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", config = toml.load("config.toml")
+        openai_api_key = config["openai"]["api_key"])
 
         # Generate response
         response = llm.predict(message)

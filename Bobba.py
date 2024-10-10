@@ -16,24 +16,19 @@ from langchain.chains import ConversationalRetrievalChain
 # Temporarily disable caching for debugging
 # @st.cache_data
 def load_data_from_url():
-    st.write("Attempting to load data from URL...")
-    """Load data from the given URL."""
+        """Load data from the given URL."""
     # Load the dataset from the GitHub repository
     file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
     try:
         response = requests.get(file_url, timeout=30)
         if response.status_code == 200:
-            st.write("HTTP request successful.")
-        else:
+                    else:
             st.error(f"HTTP request failed with status code: {response.status_code}")
             st.stop()  # Raise an error for bad status codes
         file_data = io.BytesIO(response.content)
-        st.write("Data successfully fetched from URL.")
-        xlsx = pd.ExcelFile(file_data, engine='openpyxl')
-        st.write("Available sheets:", xlsx.sheet_names)
-        df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
-        st.write(f"Excel file successfully read. Loaded sheet: {xlsx.sheet_names[0]}")
-        return df
+                xlsx = pd.ExcelFile(file_data, engine='openpyxl')
+                df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
+                return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error loading the dataset: {e}")
         st.stop()
@@ -50,7 +45,7 @@ def chat_with_data(df_chat, input_text, openai_api_key):
         if not filtered_df.empty:
             context = filtered_df.to_string(index=False)
         else:
-            context = df_chat.head(10).to_string(index=False)  # Use a general context if no specific filter is found  # Use only the first 100 rows for context
+            context = df_chat.to_string(index=False)  # Use a general context if no specific filter is found  # Use only the first 100 rows for context
 
         # Create a prompt template
         message = f"""

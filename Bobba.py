@@ -67,8 +67,9 @@ def chat_with_data(df_chat, input_text):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", config = toml.load("config.toml")
-        openai_api_key = config["openai"]["api_key"])
+        config = toml.load("config.toml")
+        openai_api_key = config["openai"]["api_key"]
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key=openai_api_key)
 
         # Generate response
         response = llm.predict(message)

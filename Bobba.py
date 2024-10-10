@@ -16,23 +16,27 @@ from langchain.chains import ConversationalRetrievalChain
 # Temporarily disable caching for debugging
 # @st.cache_data
 def load_data_from_url():
-        """Load data from the given URL."""
+    """Load data from the given URL."""
     # Load the dataset from the GitHub repository
-    file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
-    try:
+        file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
+        try:
         response = requests.get(file_url, timeout=30)
-        if response.status_code == 200:
-                    else:
-            st.error(f"HTTP request failed with status code: {response.status_code}")
+                if response.status_code == 200:
+            file_data = io.BytesIO(response.content)
+            xlsx = pd.ExcelFile(file_data, engine='openpyxl')
+            df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
+            return df
+        else:
+                        st.error(f"HTTP request failed with status code: {response.status_code}")
             st.stop()  # Raise an error for bad status codes
         file_data = io.BytesIO(response.content)
                 xlsx = pd.ExcelFile(file_data, engine='openpyxl')
                 df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
                 return df
-    except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:
         st.error(f"Error loading the dataset: {e}")
         st.stop()
-    except ValueError as e:
+        except ValueError as e:
         st.error(f"Error reading the Excel file: {e}")
         st.stop()
 

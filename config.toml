@@ -15,5 +15,5 @@ textColor = "#ffffff"
 toolbarMode = "minimal"
 
 [openai]
-api_key = "sk-aEs66jJ8EvpUXr1hanGq6NUcW5kjhtzSh2g7nMXSSdT3BlbkFJOmfLE-x1bjntgit-3WXC6uZHMX4S1hHIl6Co3Ym4UA"
+api_key = "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"
 

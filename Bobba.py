@@ -69,6 +69,9 @@ def chat_with_data(df_chat, input_text):
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
         config = toml.load("config.toml")
         openai_api_key = config["openai"]["api_key"]
+        if not openai_api_key or "sk-" not in openai_api_key:
+            st.error("Invalid API key. Please check your config.toml file and ensure the key is correct.")
+            st.stop()
         llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key=openai_api_key)
 
         # Generate response

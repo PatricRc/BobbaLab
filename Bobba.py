@@ -81,13 +81,15 @@ def chat_with_data(df_chat, input_text, openai_api_key):
         st.error(f"Error during chat: {e}")
 
 def main():
-    st.title("Chat with Your CSV/XLSX Data")
-
-    # Load data
+    # API key input
     openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
     if not openai_api_key:
         st.warning("Please enter a valid OpenAI API key.")
         return
+    st.title("Chat with Your CSV/XLSX Data")
+
+    # Load data
+    
     df = load_data_from_url()
     if df is not None:
         st.write("Data Preview:")
@@ -99,9 +101,6 @@ def main():
         # Chat button
         if st.button("Chat with Data") and input_text:
             chat_with_data(df, input_text, openai_api_key)
-
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()

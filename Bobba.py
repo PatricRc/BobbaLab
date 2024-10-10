@@ -40,7 +40,18 @@ def chat_with_data(df, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
         # Use the processed query for a summary response
-        context = df.to_string(index=False)[:10000]  # Limit to avoid API constraints
+        context = f"The dataset has {len(df)} rows and {len(df.columns)} columns.
+"
+        context += "
+Column names: " + ", ".join(df.columns) + "
+"
+        context += "
+Summary statistics:
+" + df.describe().to_string() + "
+"
+        context += "
+Sample rows:
+" + df.head(10).to_string(index=False)
 
         # Create a prompt template
         message = f"""

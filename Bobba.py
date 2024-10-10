@@ -35,32 +35,17 @@ def load_data_from_url():
         st.stop()
 
 # Process user queries
-@st.cache_data
-def process_query(df, query):
-    """Process the user's query on the DataFrame."""
-    try:
-        if "total rows" in query.lower():
-            return f"The dataset contains {len(df)} rows."
-        elif "columns" in query.lower():
-            return f"The dataset contains the following columns: {', '.join(df.columns)}."
-        elif "summary" in query.lower():
-            return df.describe().to_string()
-        else:
-            return "I'm sorry, I couldn't understand your query. Please ask about rows, columns, or summary of the dataset."
-    except Exception as e:
-        return f"Error processing query: {e}"
-
 # Chat with data using OpenAI
 def chat_with_data(df, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
         # Use the processed query for a summary response
-        summary_response = process_query(df, input_text)
+        context = df.to_string(index=False)[:10000]  # Limit to avoid API constraints
 
         # Create a prompt template
         message = f"""
         Context:
-        {summary_response}
+        {context}
 
         Question:
         {input_text}

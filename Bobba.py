@@ -13,16 +13,24 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
 
-@st.cache_data
+# Temporarily disable caching for debugging
+# @st.cache_data
 def load_data_from_url():
+    st.write("Attempting to load data from URL...")
     """Load data from the given URL."""
     # Load the dataset from the GitHub repository
     file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
     try:
-        response = requests.get(file_url)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response = requests.get(file_url, timeout=30)
+        if response.status_code == 200:
+            st.write("HTTP request successful.")
+        else:
+            st.error(f"HTTP request failed with status code: {response.status_code}")
+            st.stop()  # Raise an error for bad status codes
         file_data = io.BytesIO(response.content)
+        st.write("Data successfully fetched from URL.")
         df = pd.read_excel(file_data, engine='openpyxl', sheet_name='Sheet1')
+        st.write("Excel file successfully read.")
         return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error loading the dataset: {e}")

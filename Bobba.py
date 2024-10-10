@@ -48,15 +48,17 @@ def chat_with_data(df_chat, input_text, openai_api_key):
             context = df_chat.head(50).to_string(index=False)  # Limit to first 50 rows to avoid exceeding API limits  # Use a general context if no specific filter is found
 
         # Create a prompt template
-        message = f"Answer the following question using the provided context:
+        message = f"""
+        Answer the following question using the provided context:
 
-Context:
-{context[:max_context_length]}
+        Context:
+        {context[:max_context_length]}
 
-Question:
-{input_text}
+        Question:
+        {input_text}
 
-Answer:"
+        Answer:
+        """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
         

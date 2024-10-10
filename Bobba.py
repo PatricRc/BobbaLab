@@ -13,22 +13,20 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
 
-# Temporarily disable caching for debugging
-# @st.cache_data
+# Load data from URL
+@st.cache_data
 def load_data_from_url():
     """Load data from the given URL."""
-    # Load the dataset from the GitHub repository
     file_url = 'https://github.com/PatricRc/BobbaLab/blob/main/BobbaSales.xlsx?raw=true'
     try:
         response = requests.get(file_url, timeout=30)
         if response.status_code == 200:
             file_data = io.BytesIO(response.content)
-            xlsx = pd.ExcelFile(file_data, engine='openpyxl')
-            df = pd.read_excel(xlsx, sheet_name=xlsx.sheet_names[0])  # Load the first sheet as default
+            df = pd.read_excel(file_data, engine='openpyxl')
             return df
         else:
             st.error(f"HTTP request failed with status code: {response.status_code}")
-            st.stop()  # Raise an error for bad status codes
+            st.stop()
     except requests.exceptions.RequestException as e:
         st.error(f"Error loading the dataset: {e}")
         st.stop()
@@ -36,19 +34,33 @@ def load_data_from_url():
         st.error(f"Error reading the Excel file: {e}")
         st.stop()
 
-def chat_with_data(df_chat, input_text, openai_api_key):
+# Process user queries
+@st.cache_data
+def process_query(df, query):
+    """Process the user's query on the DataFrame."""
+    try:
+        if "total rows" in query.lower():
+            return f"The dataset contains {len(df)} rows."
+        elif "columns" in query.lower():
+            return f"The dataset contains the following columns: {', '.join(df.columns)}."
+        elif "summary" in query.lower():
+            return df.describe().to_string()
+        else:
+            return "I'm sorry, I couldn't understand your query. Please ask about rows, columns, or summary of the dataset."
+    except Exception as e:
+        return f"Error processing query: {e}"
+
+# Chat with data using OpenAI
+def chat_with_data(df, input_text, openai_api_key):
     """Chat with the survey data using OpenAI."""
     try:
-        # Convert DataFrame to a more manageable format
-        max_context_length = 10000  # Increase limit to allow more context while staying under API constraints
-        context = df_chat.to_string(index=False)[:max_context_length]  # Use the full dataset, limited by max context length
+        # Use the processed query for a summary response
+        summary_response = process_query(df, input_text)
 
         # Create a prompt template
         message = f"""
-        Answer the following question using the provided context:
-
         Context:
-        {context}
+        {summary_response}
 
         Question:
         {input_text}
@@ -70,6 +82,7 @@ def chat_with_data(df_chat, input_text, openai_api_key):
     except Exception as e:
         st.error(f"Error during chat: {e}")
 
+# Main function
 def main():
     # API key input
     openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
